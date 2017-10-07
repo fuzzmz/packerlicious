@@ -3,9 +3,11 @@
 #
 # See LICENSE file for full license.
 
+from __future__ import unicode_literals
 from future import standard_library
 standard_library.install_aliases()
-
+from future.utils import native
+from builtins import str
 from collections import OrderedDict
 import json
 import re
@@ -168,7 +170,7 @@ class BaseAWSObject(object):
             # Final validity check, compare the type of value against
             # expected_type which should now be either a single type or
             # a tuple of types.
-            elif isinstance(value, expected_type):
+            elif isinstance(self._future_safe_type(value), expected_type):
                 return self.properties.__setitem__(name, value)
             else:
                 self._raise_type(name, value, expected_type)
@@ -190,6 +192,16 @@ class BaseAWSObject(object):
                                                           name,
                                                           type(value),
                                                           expected_type))
+
+    def _future_safe_type(self, value):
+        value_type = value.__class__.__name__
+        d = {'str': str}
+        v = d[value_type]
+
+        if d is None:
+            return value
+        else:
+            return type(v)
 
     def validate_title(self):
         if not valid_names.match(self.title):
@@ -318,7 +330,7 @@ class AWSAttribute(BaseAWSObject):
 
 
 def validate_delimiter(delimiter):
-    if not isinstance(delimiter, basestring):
+    if not isinstance(delimiter, str):
         raise ValueError(
             "Delimiter must be a String, %s provided" % type(delimiter)
         )
@@ -353,17 +365,17 @@ class Parameter(AWSDeclaration):
     STRING_PROPERTIES = ['AllowedPattern', 'MaxLength', 'MinLength']
     NUMBER_PROPERTIES = ['MaxValue', 'MinValue']
     props = {
-        'Type': (basestring, True),
-        'Default': ((basestring, int, float), False),
+        'Type': (str, True),
+        'Default': ((str, int, float), False),
         'NoEcho': (bool, False),
         'AllowedValues': (list, False),
-        'AllowedPattern': (basestring, False),
+        'AllowedPattern': (str, False),
         # 'MaxLength': (validators.positive_integer, False),
         # 'MinLength': (validators.positive_integer, False),
         # 'MaxValue': (validators.integer, False),
         # 'MinValue': (validators.integer, False),
-        'Description': (basestring, False),
-        'ConstraintDescription': (basestring, False),
+        'Description': (str, False),
+        'ConstraintDescription': (str, False),
     }
 
     def validate_title(self):
@@ -389,7 +401,7 @@ class Parameter(AWSDeclaration):
             # matches (in the case of a String Type) or can be coerced
             # into one of the number formats.
             param_type = self.properties.get('Type')
-            if param_type == 'String' and not isinstance(default, basestring):
+            if param_type == 'String' and not isinstance(default, str):
                 raise ValueError(error_str %
                                  ('String', type(default), default))
             elif param_type == 'Number':
@@ -400,7 +412,7 @@ class Parameter(AWSDeclaration):
                     raise ValueError(error_str %
                                      (param_type, type(default), default))
             elif param_type == 'List<Number>':
-                if not isinstance(default, basestring):
+                if not isinstance(default, str):
                     raise ValueError(error_str %
                                      (param_type, type(default), default))
                 allowed = [float, int]

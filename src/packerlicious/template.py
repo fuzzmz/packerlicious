@@ -18,6 +18,8 @@ limitations under the License.
 """
 import json
 
+from builtins import str
+
 from thirdparty.troposphere import encode_to_dict
 
 
@@ -28,8 +30,8 @@ class Template(object):
     """
 
     props = {
-        'description': (basestring, False),
-        'min_packer_version': (basestring, False),
+        'description': (str, False),
+        'min_packer_version': (str, False),
         'variables': (dict, False),
         'builders': (list, True),
         'provisioners': (list, False),
