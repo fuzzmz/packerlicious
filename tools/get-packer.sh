@@ -6,4 +6,4 @@ IFS="_"; declare -a Elements=($*)
 PACKER_VERSION="${Elements[1]}"
 echo "Latest Packer version is ${PACKER_VERSION}"
 wget --quiet "https://releases.hashicorp.com/packer/${PACKER_VERSION}/${LATEST_PACKER}_linux_amd64.zip"
-unzip "${LATEST_PACKER}_linux_amd64.zip"
+unzip "${LATEST_PACKER}_linux_amd64.zip" -d ../
