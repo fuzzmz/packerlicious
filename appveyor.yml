@@ -3,11 +3,6 @@ environment:
   matrix:
     - PYTHON: "C:\\Python26"
       requirementsFile: "requirements-travis-26.txt"
-    - PYTHON: "C:\\Python27"
-    - PYTHON: "C:\\Python33"
-    - PYTHON: "C:\\Python34"
-    - PYTHON: "C:\\Python35"
-    - PYTHON: "C:\\Python36"
 
 install:
   - powershell tools\get-packer.ps1
